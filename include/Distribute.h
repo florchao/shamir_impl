@@ -8,7 +8,6 @@
 #include <sys/types.h>
 
 
-
 typedef struct shadow {
     uint8_t shadowNumber;
     uint64_t pointNumber;

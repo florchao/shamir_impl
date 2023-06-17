@@ -3,13 +3,13 @@
 bmpFile* openBmpFile(const char* path) {
     int fd = open(path, O_RDWR);
     if (fd == -1) {
-        perror("open");
+        printf("open");
         return NULL;
     }
 
     struct stat fileStats;
     if (fstat(fd, &fileStats) != 0) {
-        perror("fstat");
+        printf("fstat");
         close(fd);
         return NULL;
     }
@@ -20,7 +20,7 @@ bmpFile* openBmpFile(const char* path) {
     void* filePointer = malloc(fileSize);
 
     if (read(fd, filePointer, fileSize) != fileSize) {
-        perror("Unable to read file");
+        printf("Unable to read file");
         return NULL;
     }
 

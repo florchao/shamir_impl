@@ -5,17 +5,26 @@ static TShadow** initializeShadowArray(TShadowGenerator* shadowGenerator, uint32
 static uint8_t evaluatePolynomial(TShadowGenerator* shadowGenerator, uint8_t* coefficients, uint8_t value);
 static void distributeSecret(TShadowGenerator* shadowGenerator);
 static TShadowGenerator* initializeDistributor(TParams* params);
+static void hideSecret(TShadowGenerator * shadowGenerator);
+static void hideShadow(uint8_t  k , bmpFile * image, TShadow * hidingShadow);
+static void insertBits(uint8_t  *imagePixelPointer, uint8_t  *shadowPointer, uint8_t k);
+
+uint8_t fourSignificant[] = {0xC0, 0x30, 0x0C, 0x03};
+uint8_t twoSignificant[] = {0xF0, 0x0F};
+
 
 void distribute(TParams* params) {
     TShadowGenerator* generator = initializeDistributor(params);
     distributeSecret(generator);
-    printf("\n");
-    printf("Shadows generated:\n");
-    for (uint8_t i = 0; i < generator->n; i++) {
-        for (uint64_t j = 0; j < generator->generatedShadows[i]->pointNumber; j++) {
-            printf("%d ", generator->generatedShadows[i]->points[j]);
-        }
-    }
+    // printf("\n");
+    // printf("Shadows generated:\n");
+    // for (uint8_t i = 0; i < 1; i++) {
+    //     for (uint64_t j = 0; j < generator->generatedShadows[i]->pointNumber; j++) {
+    //         printf("%d ", generator->generatedShadows[i]->points[j]);
+    //     }
+    // }
+    hideSecret(generator);
+    printf("llegue");
 }
 
 //---------------------------------------------------
@@ -43,7 +52,7 @@ static void distributeSecret(TShadowGenerator* shadowGenerator) {
     uint8_t* aCoefficients = malloc(k * sizeof(uint8_t));
     uint8_t* bCoefficients = malloc(k * sizeof(uint8_t));
     uint8_t a_0, a_1;
-
+    printf("%d", shadowPoints);
     while (currentBlock < shadowPoints) {
 
         memcpy(aCoefficients, pixelPoints, k);
@@ -128,4 +137,56 @@ static uint8_t evaluatePolynomial(TShadowGenerator* shadowGenerator, uint8_t* co
     }
 
     return result;
+}
+
+static void hideSecret(TShadowGenerator * shadowGenerator){
+    for (int i = 0 ; i < shadowGenerator -> n ; i ++){
+        printf("%s \n",shadowGenerator->imageFiles[i]);
+        bmpFile  * currentImageFile = openBmpFile(shadowGenerator->imageFiles[i]);
+        TShadow * currentShadow = shadowGenerator->generatedShadows[i];
+        hideShadow(shadowGenerator->k,currentImageFile, currentShadow);
+
+        //save the generated image.
+        int headerSize = currentImageFile->header->size - currentImageFile->header->image_size_bytes;
+        //re-write the entire file.
+         lseek(currentImageFile->fd, 0, SEEK_SET);
+        write(currentImageFile->fd , currentImageFile->header, headerSize);
+        write(currentImageFile->fd , currentImageFile->pixels, currentImageFile->header->image_size_bytes);
+        close(currentImageFile->fd);
+    }
+
+}
+
+
+static void hideShadow(uint8_t  k , bmpFile * image, TShadow * hidingShadow){
+    image->header->reserved1 = hidingShadow->shadowNumber; //save the shadow number.
+    uint8_t * imagePixelPointer = image->pixels;
+    uint8_t * shadowPointer = hidingShadow->points;
+    for(uint32_t  i = 0; i < hidingShadow->pointNumber; i++ ){
+            insertBits(imagePixelPointer, shadowPointer, k);
+            shadowPointer += 1 ; //go to the next point;
+            imagePixelPointer += (k == 3 || k == 4) ? 2 : 4;
+    }
+}
+
+static void insertBits(uint8_t  * imagePixelPointer, uint8_t  *shadowPointer, uint8_t  k){
+    int lsb4 = ( k == 3 || k == 4 ) ? 1 : 0;
+    int bytesUsedFromImage = ( lsb4 ) ? 2 : 4;
+
+    uint8_t  lsb4Shifter[] = {4, 0};
+    uint8_t  lsb2Shifter[] = {6,4,2, 0};
+    int currentShifterIndex = 0 ;
+
+    uint8_t  bits[bytesUsedFromImage];
+
+    for(int i = 0; i < bytesUsedFromImage ; i++){
+        bits[i] = lsb4 ? *shadowPointer & twoSignificant[i] : *shadowPointer & fourSignificant[i] ;
+        bits[i] = lsb4 ? bits[i] >> lsb4Shifter[currentShifterIndex] : bits[i] >>lsb2Shifter[currentShifterIndex];
+        currentShifterIndex++;
+    }
+
+    int and = lsb4 ? 0xF0 : 0xFC;  // 4 o 6 MSB.
+    for (int i = 0 ; i < bytesUsedFromImage ; i++)
+        imagePixelPointer[i] = (imagePixelPointer[i] & and) + bits[i];
+
 }
