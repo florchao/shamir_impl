@@ -1,8 +1,8 @@
 #include "../../include/Distribute.h"
 
 static void openDirectory(TShadowGenerator* generator, char* directoryPath);
-static TShadow** initializeShadowArray(TShadowGenerator* shadowGenerator, uint32_t shadowPoints);
-static uint8_t evaluatePolynomial(TShadowGenerator* shadowGenerator, uint8_t* coefficients, uint8_t value);
+static TShadow** initializeShadows(TShadowGenerator* shadowGenerator, uint32_t blockCount);
+static uint8_t poly(uint8_t k, uint8_t* coefficients, uint8_t value);
 static void distributeSecret(TShadowGenerator* shadowGenerator);
 static TShadowGenerator* initializeDistributor(TParams* params);
 static void hideSecret(TShadowGenerator * shadowGenerator);
@@ -38,43 +38,49 @@ static TShadowGenerator* initializeDistributor(TParams* params) {
     shadowGenerator->n = params->n;
     openDirectory(shadowGenerator, params->directory);
     return shadowGenerator;
-
-
 }
 
 static void distributeSecret(TShadowGenerator* shadowGenerator) {
-    uint32_t shadowPoints = (shadowGenerator->file->header->size) / (shadowGenerator->k - 1);
-    TShadow** shadowArray = initializeShadowArray(shadowGenerator, shadowPoints);
-
-    uint8_t* pixelPoints = shadowGenerator->file->pixels;
+    uint32_t blockCount = (shadowGenerator->file->header->size) / (shadowGenerator->k - 1);
     uint8_t k = shadowGenerator->k;
+    uint8_t blockSize = 2 * k - 2;
+
+    TShadow** shadows = initializeShadows(shadowGenerator, blockCount);
+
+    uint8_t* blockPosition = shadowGenerator->file->pixels;
+    
     uint32_t currentBlock = 0;
-    uint8_t* aCoefficients = malloc(k * sizeof(uint8_t));
-    uint8_t* bCoefficients = malloc(k * sizeof(uint8_t));
+    uint8_t* a_c = malloc(k * sizeof(uint8_t));
+    uint8_t* b_c = malloc(k * sizeof(uint8_t));
     uint8_t a_0, a_1;
 
-    while (currentBlock < shadowPoints) {
+    while (currentBlock < blockCount) {
 
-        memcpy(aCoefficients, pixelPoints, k);
-        memcpy(bCoefficients + 2, pixelPoints + k, k - 2);
-        uint8_t random = (rand() % (P - 2)) + 1;
-        a_0 = mod(aCoefficients[0]) == 0 ? 1 : aCoefficients[0];
-        a_1 = mod(aCoefficients[1]) == 0 ? 1 : aCoefficients[1];
-        bCoefficients[0] = mod(mul(mod(-random), a_0));
-        bCoefficients[1] = mod(mul(mod(-random), a_1));
+        memcpy(a_c, blockPosition, k);
+        memcpy(b_c + 2, blockPosition + k, k - 2);
+        uint8_t r = 0;
+        while (r == 0) {
+            r = rand() % 251;
+        }
+        a_0 = mod(a_c[0]) == 0 ? 1 : a_c[0];
+        a_1 = mod(a_c[1]) == 0 ? 1 : a_c[1];
+        b_c[0] = mod(mul(mod(-r), a_0));
+        b_c[1] = mod(mul(mod(-r), a_1));
 
         for (int j = 0; j < shadowGenerator->n; j++) {
-            shadowArray[j]->points[currentBlock] = evaluatePolynomial(shadowGenerator,
-                aCoefficients, shadowArray[j]->shadowNumber);
-            shadowArray[j]->points[currentBlock + 1] = evaluatePolynomial(shadowGenerator,
-                bCoefficients, shadowArray[j]->shadowNumber);
+            shadows[j]->points[currentBlock] = poly(shadowGenerator->k,
+                a_c, shadows[j]->shadowNumber);
+            shadows[j]->points[currentBlock + 1] = poly(shadowGenerator->k,
+                b_c, shadows[j]->shadowNumber);
         }
 
-        pixelPoints += (2 * k) - 2;
+        blockPosition += blockSize;
         currentBlock += 2;
     }
 
-    shadowGenerator->generatedShadows = shadowArray;
+    shadowGenerator->generatedShadows = shadows;
+    free(a_c);
+    free(b_c);
 }
 
 static void openDirectory(TShadowGenerator* generator, char* directoryPath) {
@@ -112,28 +118,28 @@ static void openDirectory(TShadowGenerator* generator, char* directoryPath) {
     // }
 }
 
-static TShadow** initializeShadowArray(TShadowGenerator* shadowGenerator, uint32_t shadowPoints) {
+static TShadow** initializeShadows(TShadowGenerator* shadowGenerator, uint32_t blockCount) {
 
-    TShadow** shadowArray = malloc(shadowGenerator->n * sizeof(TShadow*));
+    TShadow** shadows = malloc(shadowGenerator->n * sizeof(TShadow*));
     //initialize all TShadow structures.
     for (int i = 0; i < shadowGenerator->n; i++) {
-        shadowArray[i] = malloc(sizeof(TShadow));
-        shadowArray[i]->shadowNumber = i + 1;
-        shadowArray[i]->pointNumber = shadowPoints;
-        shadowArray[i]->points = malloc(shadowPoints * sizeof(uint8_t));
+        shadows[i] = malloc(sizeof(TShadow));
+        shadows[i]->shadowNumber = i + 1;
+        shadows[i]->pointNumber = blockCount;
+        shadows[i]->points = malloc(blockCount * sizeof(uint8_t));
     }
-    return  shadowArray;
+    return  shadows;
 }
 
-static uint8_t evaluatePolynomial(TShadowGenerator* shadowGenerator, uint8_t* coefficients, uint8_t value) {
+static uint8_t poly(uint8_t k, uint8_t* coefficients, uint8_t value) {
     uint8_t result = 0;
-    uint8_t power = 1;
+    uint8_t exp = 1;
 
     uint8_t x2 = mod(value);
 
-    for (uint8_t i = 0; i < shadowGenerator->k; i++) {
-        result = sum(result, mul(coefficients[i], power));
-        power = mul(power, x2);
+    for (uint8_t i = 0; i < k; i++) {
+        result = sum(result, mul(coefficients[i], exp));
+        exp = mul(exp, x2);
     }
 
     return result;
