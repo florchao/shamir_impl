@@ -1,0 +1,40 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -pedantic -std=c99 #-fsanitize=address
+LDFLAGS = -lm
+
+INCLUDE_DIR = include
+INCLUDES = $(addprefix -I, $(INCLUDE_DIR))
+
+TARGET_DIR = target
+
+SRC_DIR = src
+BIN_DIR = bin
+DIST_DIR = $(SRC_DIR)/Distribute
+REC_DIR = $(SRC_DIR)/Recover
+
+SS_EXEC = $(BIN_DIR)/ss
+
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+SRCS += $(wildcard $(DIST_DIR)/*.c)
+SRCS += $(wildcard $(REC_DIR)/*.c)
+
+OBJ= $(patsubst %.c, %.o, $(SRCS))
+
+# OBJS = $(patsubst %.c, $(BIN_DIR)/%.o, $(SRCS))
+# TARGET = $(BIN_DIR)/main
+
+
+
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET) $(OBJS)
+	rm -rf $(BIN_DIR)/*.o
+
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -rf $(BIN_DIR)/*
