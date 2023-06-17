@@ -52,7 +52,7 @@ static void distributeSecret(TShadowGenerator* shadowGenerator) {
     uint8_t* aCoefficients = malloc(k * sizeof(uint8_t));
     uint8_t* bCoefficients = malloc(k * sizeof(uint8_t));
     uint8_t a_0, a_1;
-    printf("%d", shadowPoints);
+
     while (currentBlock < shadowPoints) {
 
         memcpy(aCoefficients, pixelPoints, k);

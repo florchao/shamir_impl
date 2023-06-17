@@ -18,6 +18,7 @@ typedef struct shadow {
 
 // s1 = {
 //       1 (1 a n), j(q de bloques), [v1, .., vj]
+//                                  v0m, v0d, v2m, v2d, 
 //       }
 
 
