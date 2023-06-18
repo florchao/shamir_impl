@@ -21,7 +21,6 @@ typedef struct shadow {
 //                                  v0m, v0d, v2m, v2d, 
 //       }
 
-
 typedef struct shadowGenerator {
     bmpFile* file;
     uint8_t  k;

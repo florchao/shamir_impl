@@ -25,7 +25,7 @@ TParams* validateParams(int argc, char* argv[]) {
     }
     struct params* params = malloc(sizeof(struct params));
     params->action = strcmp(argv[1], "d") == 0 ? DISTRIBUTE : RETRIEVE;
-    params->file = malloc(strlen(argv[2]));
+    params->file = malloc((strlen(argv[2]) + 1) * sizeof(char));
     strcpy(params->file, argv[2]);
     params->k = atoi(argv[3]);
     int valid = 0;
@@ -37,7 +37,7 @@ TParams* validateParams(int argc, char* argv[]) {
         printf("Invalid k: %d\n", params->k);
         exit(1);
     }
-    params->directory = malloc(strlen(argv[4]));
+    params->directory = malloc(sizeof(argv[4]));
     strcpy(params->directory, argv[4]);
     params->n = 8; //SHADOWS_NUMBER;
     return params;

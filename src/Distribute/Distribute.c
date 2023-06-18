@@ -8,6 +8,7 @@ static TShadowGenerator* initializeDistributor(TParams* params);
 static void hideSecret(TShadowGenerator * shadowGenerator);
 static void hideShadow(uint8_t  k , bmpFile * image, TShadow * hidingShadow);
 static void insertBits(uint8_t  *imagePixelPointer, uint8_t  *shadowPointer, uint8_t k);
+static void freeShadows(TShadow** shadows, uint8_t length);
 
 uint8_t fourSignificant[] = {0xC0, 0x30, 0x0C, 0x03};
 uint8_t twoSignificant[] = {0xF0, 0x0F};
@@ -25,6 +26,9 @@ void distribute(TParams* params) {
     // }
     hideSecret(generator);
     printf("llegue");
+    free(generator->file);
+    freeShadows(generator->generatedShadows, generator->n);
+    free(generator);
 }
 
 //---------------------------------------------------
@@ -41,6 +45,7 @@ static TShadowGenerator* initializeDistributor(TParams* params) {
 }
 
 static void distributeSecret(TShadowGenerator* shadowGenerator) {
+
     uint32_t blockCount = (shadowGenerator->file->header->size) / (shadowGenerator->k - 1);
     uint8_t k = shadowGenerator->k;
     uint8_t blockSize = 2 * k - 2;
@@ -50,14 +55,16 @@ static void distributeSecret(TShadowGenerator* shadowGenerator) {
     uint8_t* blockPosition = shadowGenerator->file->pixels;
     
     uint32_t currentBlock = 0;
-    uint8_t* a_c = malloc(k * sizeof(uint8_t));
-    uint8_t* b_c = malloc(k * sizeof(uint8_t));
     uint8_t a_0, a_1;
 
     while (currentBlock < blockCount) {
+        uint8_t* a_c = malloc(k * sizeof(uint8_t));
+        uint8_t* b_c = malloc(k * sizeof(uint8_t));
 
         memcpy(a_c, blockPosition, k);
+        //ME DA BUFFER OVERFLOW ACA CUANDO ESTA POR EL BLOQUE 45000
         memcpy(b_c + 2, blockPosition + k, k - 2);
+        
         uint8_t r = 0;
         while (r == 0) {
             r = rand() % 251;
@@ -76,11 +83,15 @@ static void distributeSecret(TShadowGenerator* shadowGenerator) {
 
         blockPosition += blockSize;
         currentBlock += 2;
+        free(a_c);
+        free(b_c);
+        printf("ACA %d de %d\n", currentBlock, blockCount);
+
     }
 
+    printf("ACAC\n");
     shadowGenerator->generatedShadows = shadows;
-    free(a_c);
-    free(b_c);
+
 }
 
 static void openDirectory(TShadowGenerator* generator, char* directoryPath) {
@@ -90,7 +101,6 @@ static void openDirectory(TShadowGenerator* generator, char* directoryPath) {
         return;
     }
     char** fileNames = malloc(generator->n * sizeof(char*));
-
     int currentFile = 0;
     struct dirent* entry;
     while ((entry = readdir(directory)) != NULL) {
@@ -98,7 +108,8 @@ static void openDirectory(TShadowGenerator* generator, char* directoryPath) {
             continue;
         }
         uint64_t directoryLength = strlen(directoryPath);
-        fileNames[currentFile] = malloc(directoryLength + 1 + strlen(entry->d_name));
+        size_t fileNameLength = strlen(entry->d_name);
+        fileNames[currentFile] = malloc((directoryLength + 1 + fileNameLength + 1) * sizeof(char));
         strcpy(fileNames[currentFile], directoryPath);
         strcpy(fileNames[currentFile] + directoryLength, "/");
         strcpy(fileNames[currentFile] + directoryLength + 1, entry->d_name);
@@ -113,14 +124,21 @@ static void openDirectory(TShadowGenerator* generator, char* directoryPath) {
         strcpy(generator->imageFiles[i] + strlen(fileNames[i]), "\0");
     }
 
+    for(int i=0 ; i<generator->n; i++){
+        free(fileNames[i]);
+    }
+    free(fileNames);
+    free(entry);
+    free(directory);
     // for (int i = 0; i < generator->n; i++) {
     //     printf("%s\n", generator->imageFiles[i]);
     // }
 }
 
-static TShadow** initializeShadows(TShadowGenerator* shadowGenerator, uint32_t blockCount) {
+static TShadow ** initializeShadows(TShadowGenerator* shadowGenerator, uint32_t blockCount) {
 
     TShadow** shadows = malloc(shadowGenerator->n * sizeof(TShadow*));
+    
     //initialize all TShadow structures.
     for (int i = 0; i < shadowGenerator->n; i++) {
         shadows[i] = malloc(sizeof(TShadow));
@@ -155,7 +173,7 @@ static void hideSecret(TShadowGenerator * shadowGenerator){
         //save the generated image.
         int headerSize = currentImageFile->header->size - currentImageFile->header->image_size_bytes;
         //re-write the entire file.
-         lseek(currentImageFile->fd, 0, SEEK_SET);
+        lseek(currentImageFile->fd, 0, SEEK_SET);
         write(currentImageFile->fd , currentImageFile->header, headerSize);
         write(currentImageFile->fd , currentImageFile->pixels, currentImageFile->header->image_size_bytes);
         close(currentImageFile->fd);
@@ -195,4 +213,12 @@ static void insertBits(uint8_t  * imagePixelPointer, uint8_t  *shadowPointer, ui
     for (int i = 0 ; i < bytesUsedFromImage ; i++)
         imagePixelPointer[i] = (imagePixelPointer[i] & and) + bits[i];
 
+}
+
+static void freeShadows(TShadow** shadows, uint8_t length){
+    for(int i=0; i< length; i++){
+        free(shadows[i]->points);
+        free(shadows[i]);
+    }
+    free(shadows);
 }

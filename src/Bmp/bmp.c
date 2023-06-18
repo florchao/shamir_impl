@@ -33,6 +33,7 @@ bmpFile* openBmpFile(const char* path) {
     bitMapFile->header = headerPointer;
     bitMapFile->pixels = pixelsPointer;
     bitMapFile->fd = fd;
+
     return bitMapFile;
 }
 
