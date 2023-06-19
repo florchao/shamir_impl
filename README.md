@@ -1,11 +1,11 @@
 # Implementation of the Shamir Shared Secret algorithm for black and white images
 
 ## Contents:
-    - [1. Authors](#1-authors)
-    - [2. Prerrequisites](#2-prerrequisites)
-    - [3. Compilation](#3-compilation)
-    - [4. Execution](#4-execution)
-    - [5. Cleanup](#5-cleanup)
+1. [Authors](#1-authors)
+1. [Prerrequisites](#2-prerrequisites)
+1. [Compilation](#3-compilation)
+1. [Execution](#4-execution)
+1. [Cleanup](#5-cleanup)
 
 ### 1. Authors
 * [Chao, Florencia](https://github.com/florchao)
