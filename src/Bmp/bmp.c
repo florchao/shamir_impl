@@ -3,13 +3,13 @@
 bmpFile* openBmpFile(const char* path) {
     int fd = open(path, O_RDWR);
     if (fd == -1) {
-        printf("open");
+        perror("open");
         return NULL;
     }
 
     struct stat fileStats;
     if (fstat(fd, &fileStats) != 0) {
-        printf("fstat");
+        perror("fstat");
         close(fd);
         return NULL;
     }
@@ -19,12 +19,12 @@ bmpFile* openBmpFile(const char* path) {
 
     void* filePointer = malloc(fileSize);
     if (filePointer == NULL) {
-            printf("Memory allocation failed for file pointer.\n");
+            perror("Memory allocation failed for file pointer.\n");
             return NULL;
     }
 
     if (read(fd, filePointer, fileSize) != fileSize) {
-        printf("Unable to read file");
+        perror("Unable to read file");
         return NULL;
     }
 
@@ -33,7 +33,7 @@ bmpFile* openBmpFile(const char* path) {
 
     bmpFile* bitMapFile = malloc(sizeof(bmpFile));
     if (bitMapFile == NULL) {
-            printf("Memory allocation failed for file.\n");
+            perror("Memory allocation failed for file.\n");
             return NULL;
     }
     bitMapFile->header = headerPointer;

@@ -14,11 +14,9 @@ void recover(TParams* params){
         perror("Failed to initialize recover");
         exit(1);
     }
-    printf("sali de initialize recover");
     initializeShadows(recover);
     
     recoverSecret(recover);
-    printf("llegue after recover\n");
     //freeShadows(recover->generatedShadows, recover->n);
     freerecover(recover);
 }
@@ -30,7 +28,7 @@ void recover(TParams* params){
 static TShadowGenerator* initializeRecover(TParams* params) {
     TShadowGenerator* recover = malloc(sizeof(TShadowGenerator));
     if (recover == NULL) {
-        printf("Memory allocation failed for recover.\n");
+        perror("Memory allocation failed for recover.\n");
         return NULL;
     }
     recover->k = params->k;
@@ -41,7 +39,7 @@ static TShadowGenerator* initializeRecover(TParams* params) {
     recover->recoveredImage = malloc(strlen(params->file) + 1);
     if (recover->recoveredImage == NULL) {
         free(recover);
-        printf("Memory allocation failed for recover.\n");
+        perror("Memory allocation failed for recover.\n");
         return NULL;
     }
     strcpy(recover->recoveredImage, params->file);
@@ -173,7 +171,6 @@ static void recoverSecret(TShadowGenerator* generator){
         currentBlock += 2 ;
     }
 
-    printf("hola");
     int fd = open(generator->recoveredImage, O_WRONLY | O_CREAT);
     if (fd == -1) {
         free(a_c);
@@ -188,9 +185,7 @@ static void recoverSecret(TShadowGenerator* generator){
     lseek(fd, 0, SEEK_SET);
     write(fd, generator->file->header, headerSize);
     write(fd, generator->file->pixels, generator->file->header->image_size_bytes);
-    printf("todavia no se cerro");
     close(fd);
-    printf("se cerro el fd");
     free(a_c);
     free(b_c);
     free(x_c);

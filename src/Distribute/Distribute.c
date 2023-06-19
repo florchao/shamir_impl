@@ -16,7 +16,6 @@ void distribute(TParams* params) {
     TShadowGenerator* generator = initializeDistributor(params);
     distributeSecret(generator);
     hideSecret(generator);
-    printf("llegue");
     free(generator->file);
     freeShadows(generator->generatedShadows, generator->n);
     free(generator);
@@ -123,7 +122,6 @@ static uint8_t poly(uint8_t k, uint8_t* coefficients, uint8_t value) {
 
 static void hideSecret(TShadowGenerator * shadowGenerator){
     for (int i = 0 ; i < shadowGenerator -> n ; i ++){
-        printf("%s \n",shadowGenerator->imageFiles[i]);
         bmpFile  * currentImageFile = openBmpFile(shadowGenerator->imageFiles[i]);
         TShadow * currentShadow = shadowGenerator->generatedShadows[i];
         hideShadow(shadowGenerator->k,currentImageFile, currentShadow);
