@@ -1,6 +1,5 @@
 #include "../../include/Distribute.h"
 
-static void openDirectory(TShadowGenerator* generator, char* directoryPath);
 static TShadow** initializeShadows(TShadowGenerator* shadowGenerator, uint32_t blockCount);
 static uint8_t poly(uint8_t k, uint8_t* coefficients, uint8_t value);
 static void distributeSecret(TShadowGenerator* shadowGenerator);
@@ -92,47 +91,6 @@ static void distributeSecret(TShadowGenerator* shadowGenerator) {
     printf("ACAC\n");
     shadowGenerator->generatedShadows = shadows;
 
-}
-
-static void openDirectory(TShadowGenerator* generator, char* directoryPath) {
-    DIR* directory = opendir(directoryPath);
-    if (directory == NULL) {
-        perror("Unable to open the given directory");
-        return;
-    }
-    char** fileNames = malloc(generator->n * sizeof(char*));
-    int currentFile = 0;
-    struct dirent* entry;
-    while ((entry = readdir(directory)) != NULL) {
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-            continue;
-        }
-        uint64_t directoryLength = strlen(directoryPath);
-        size_t fileNameLength = strlen(entry->d_name);
-        fileNames[currentFile] = malloc((directoryLength + 1 + fileNameLength + 1) * sizeof(char));
-        strcpy(fileNames[currentFile], directoryPath);
-        strcpy(fileNames[currentFile] + directoryLength, "/");
-        strcpy(fileNames[currentFile] + directoryLength + 1, entry->d_name);
-        currentFile++;
-    }
-
-    generator->imageFiles = malloc(currentFile * sizeof(char*));
-
-    for (int i = 0; i < currentFile; i++) {
-        generator->imageFiles[i] = malloc(strlen(fileNames[i]) * sizeof(char) + 1);
-        strcpy(generator->imageFiles[i], fileNames[i]);
-        strcpy(generator->imageFiles[i] + strlen(fileNames[i]), "\0");
-    }
-
-    for(int i=0 ; i<generator->n; i++){
-        free(fileNames[i]);
-    }
-    free(fileNames);
-    free(entry);
-    free(directory);
-    // for (int i = 0; i < generator->n; i++) {
-    //     printf("%s\n", generator->imageFiles[i]);
-    // }
 }
 
 static TShadow ** initializeShadows(TShadowGenerator* shadowGenerator, uint32_t blockCount) {

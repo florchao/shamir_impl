@@ -1,5 +1,6 @@
 #include "../include/utils.h"
 #include "../include/Distribute.h"
+#include "../include/Recover.h"
 
 TParams* validateParams(int argc, char* argv[]);
 uint8_t validK[] = { 3,4,5,6,7,8 };
@@ -14,6 +15,8 @@ int main(int argc, char* argv[]) {
     printf("Directory: %s\n", params->directory);
     if (params->action == DISTRIBUTE)
         distribute(params);
+    else
+        recover(params);
     return 0;
 }
 

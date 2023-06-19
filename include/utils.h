@@ -5,22 +5,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> 
+#include <dirent.h>
+#include "bmp.h"
+
 
 #define EXPECTED_PARAMS 5
 #define P 251
 
-enum programAction {
+typedef enum {
     DISTRIBUTE,
     RETRIEVE
-};
+} PROGRAM_ACTION;
 
 typedef struct params {
-    enum programAction action;
+    PROGRAM_ACTION action;
     char* file;
     uint8_t  k;
     char* directory;
     uint8_t n;
 } TParams;
+
+typedef struct shadow {
+    uint8_t shadowNumber;
+    uint64_t pointNumber;
+    uint8_t* points;
+} TShadow;
+
+// [[s1], [s2], .. [sn]]
+
+// s1 = {
+//       1 (1 a n), j(q de bloques), [v1, .., vj]
+//                                  v0m, v0d, v2m, v2d, 
+//       }
+
+typedef struct shadowGenerator {
+    bmpFile* file;
+    uint8_t  k;
+    uint8_t  n;
+    TShadow** generatedShadows;
+    char** imageFiles;
+    char* retrievedImage;
+} TShadowGenerator;
 
 
 uint8_t  sum(uint64_t x, uint64_t y);
@@ -29,6 +54,7 @@ uint8_t  mul(uint64_t x, uint64_t y);
 uint8_t  modDiv(uint64_t x, uint64_t y);
 uint8_t mod(int64_t x);
 
+void openDirectory(TShadowGenerator* generator, char* directoryPath);
 
 static const uint8_t inverses[P] = {
         0, 1, 126, 84, 63, 201, 42, 36, 157, 28, 226, 137, 21, 58, 18, 67, 204,
