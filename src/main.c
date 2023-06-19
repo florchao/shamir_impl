@@ -32,6 +32,7 @@ TParams* validateParams(int argc, char* argv[]) {
     params->file = malloc((strlen(argv[2]) + 1));
     if (params->file == NULL) {
             printf("Memory allocation failed for file.\n");
+            free(params);
             exit(1);
     }
     strcpy(params->file, argv[2]);
@@ -43,11 +44,15 @@ TParams* validateParams(int argc, char* argv[]) {
     }
     if (!valid) {
         printf("Invalid k: %d\n", params->k);
+        free(params->file);
+        free(params);
         exit(1);
     }
     params->directory = malloc(sizeof(argv[4]) + 1);
     if (params->directory == NULL) {
             printf("Memory allocation failed for directory.\n");
+            free(params->file);
+            free(params);
             exit(1);
     }
     strcpy(params->directory, argv[4]);
