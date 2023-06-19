@@ -8,8 +8,10 @@
 
 //Error codes
 #define ERROR_MALLOC 1
-#define ERROR_INIT 2
-#define ERROR_PARAMS 3
+#define ERROR_PARAMS 2
+#define ERROR_OPEN_IMAGE 3
+#define ERROR_OPEN_FILE 4
+#define ERROR_READ_FILE 5
 
 void exitError(uint8_t errorCode);
 

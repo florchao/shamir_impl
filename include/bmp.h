@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
+#include "errors.h"
 
 
 //https://codereview.stackexchange.com/questions/196084/read-and-write-bmp-file-in-c

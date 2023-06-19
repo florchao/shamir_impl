@@ -22,15 +22,13 @@ TParams* validateParams(int argc, char* argv[]) {
     }
     struct params* params = malloc(sizeof(struct params));
     if (params == NULL) {
-            perror("Memory allocation failed for params.\n");
-            exit(1);
+        exitError(ERROR_MALLOC);
     }
     params->action = strcmp(argv[1], "d") == 0 ? DISTRIBUTE : RECOVER;
     params->file = malloc((strlen(argv[2]) + 1));
     if (params->file == NULL) {
-            perror("Memory allocation failed for file.\n");
             free(params);
-            exit(1);
+            exitError(ERROR_MALLOC);
     }
     strcpy(params->file, argv[2]);
     params->k = atoi(argv[3]);
@@ -40,17 +38,15 @@ TParams* validateParams(int argc, char* argv[]) {
             valid = 1;
     }
     if (!valid) {
-        perror("Invalid k:\n");
         free(params->file);
         free(params);
-        exit(1);
+        exitError(ERROR_PARAMS);
     }
     params->directory = malloc(sizeof(argv[4]) + 1);
     if (params->directory == NULL) {
-            perror("Memory allocation failed for directory.\n");
             free(params->file);
             free(params);
-            exit(1);
+            exitError(ERROR_MALLOC);
     }
     strcpy(params->directory, argv[4]);
     params->n = 8; //SHADOWS_NUMBER;

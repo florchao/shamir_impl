@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "../../include/utils.h"
 
 uint8_t  sum(uint64_t x, uint64_t y) {
     return mod(x + y);
@@ -23,7 +23,7 @@ void openDirectory(TShadowGenerator* generator, char* directoryPath) {
     DIR* directory = opendir(directoryPath);
     if (directory == NULL) {
         perror("Unable to open the given directory");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     char** fileNames = malloc(generator->n * sizeof(char*));
     int currentFile = 0;

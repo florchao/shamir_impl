@@ -12,12 +12,11 @@ void recover(TParams* params){
     TShadowGenerator * recover = initializeRecover(params);
     if(recover == NULL) {
         perror("Failed to initialize recover");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     initializeShadows(recover);
     
     recoverSecret(recover);
-    //freeShadows(recover->generatedShadows, recover->n);
     freerecover(recover);
 }
 
@@ -28,8 +27,7 @@ void recover(TParams* params){
 static TShadowGenerator* initializeRecover(TParams* params) {
     TShadowGenerator* recover = malloc(sizeof(TShadowGenerator));
     if (recover == NULL) {
-        perror("Memory allocation failed for recover.\n");
-        return NULL;
+        exitError(ERROR_MALLOC);
     }
     recover->k = params->k;
     recover->n = params->n;
@@ -39,8 +37,7 @@ static TShadowGenerator* initializeRecover(TParams* params) {
     recover->recoveredImage = malloc(strlen(params->file) + 1);
     if (recover->recoveredImage == NULL) {
         free(recover);
-        perror("Memory allocation failed for recover.\n");
-        return NULL;
+        exitError(ERROR_MALLOC);
     }
     strcpy(recover->recoveredImage, params->file);
     return recover;
@@ -50,8 +47,7 @@ static void initializeShadows(TShadowGenerator* shadowGenerator) {
 
    TShadow** parsedShadows = malloc(shadowGenerator->k * sizeof(TShadow*));
     if (parsedShadows == NULL) {
-        perror("Unable to allocate memory for parsedShadows");
-        return;
+        exitError(ERROR_MALLOC);
     }
 
     bmpFile* currentImageFile = NULL;
@@ -59,14 +55,14 @@ static void initializeShadows(TShadowGenerator* shadowGenerator) {
     for (int i = 0; i < shadowGenerator->k; i++) {
         currentImageFile = openBmpFile(shadowGenerator->imageFiles[i]);
         if (currentImageFile == NULL) {
-            perror("Failed to open BMP file");
             freeShadows(parsedShadows, shadowGenerator->k);
+            exitError(ERROR_MALLOC);
             return;
         }
         parsedShadows[i] = fromImageToShadow(shadowGenerator->k, currentImageFile);
         if (parsedShadows[i] == NULL) {
-            perror("Failed to convert image to shadow");
             freeShadows(parsedShadows, i);  // Free previously allocated shadows
+            exitError(ERROR_MALLOC);
             return;
         }
     }
@@ -75,17 +71,17 @@ static void initializeShadows(TShadowGenerator* shadowGenerator) {
 
     shadowGenerator->file = malloc(sizeof(bmpFile));
     if (shadowGenerator->file == NULL) {
-        perror("Unable to allocate memory for bmpFile");
         freeShadows(parsedShadows, shadowGenerator->k);
+        exitError(ERROR_MALLOC);
         return;
     }
 
     int headerSize = currentImageFile->header->size - currentImageFile->header->image_size_bytes;
     shadowGenerator->file->header = malloc(headerSize);
     if (shadowGenerator->file->header == NULL) {
-        perror("Unable to allocate memory for bmp file header");
         free(shadowGenerator->file);
         freeShadows(parsedShadows, shadowGenerator->k);
+        exitError(ERROR_MALLOC);
         return;
     }
 
@@ -93,10 +89,10 @@ static void initializeShadows(TShadowGenerator* shadowGenerator) {
 
     shadowGenerator->file->pixels = malloc(currentImageFile->header->image_size_bytes);
     if (shadowGenerator->file->pixels == NULL) {
-        perror("Unable to allocate memory for bmp file pixels");
         free(shadowGenerator->file->header);
         free(shadowGenerator->file);
         freeShadows(parsedShadows, shadowGenerator->k);
+        exitError(ERROR_MALLOC);
         return;
     }
 
@@ -151,8 +147,7 @@ static void recoverSecret(TShadowGenerator* generator){
     uint8_t  * b_c = malloc(k);
 
     if (x_c == NULL || a_c == NULL || b_c == NULL){
-        perror("Unable to allocate memory for points");
-        exit(1);
+        exitError(ERROR_MALLOC);
     }
 
     while( currentBlock < ( (generator->file->header->image_size_bytes) / (k - 1)) ){
@@ -176,8 +171,7 @@ static void recoverSecret(TShadowGenerator* generator){
         free(a_c);
         free(b_c);
         free(x_c);
-        perror("Failed to open recovered image");
-        exit(1) ;
+        exitError(ERROR_OPEN_IMAGE);
     }
 
     //save the recoverd image.

@@ -4,7 +4,7 @@ static char* getErrorMsg(uint8_t errorCode);
 
 void exitError(uint8_t errorCode) {
     perror(getErrorMsg(errorCode));
-    exit(errorCode);
+    exit(EXIT_FAILURE);
 }
 
 //---------------------------------------------------
@@ -15,10 +15,14 @@ static char* getErrorMsg(uint8_t errorCode) {
     switch (errorCode) {
         case ERROR_MALLOC:
             return "Error allocating memory";
-        case ERROR_INIT:
-            return "Error initializing";
         case ERROR_PARAMS:
-            return "Error in params";
+            return "Invalid parameters";
+        case ERROR_OPEN_IMAGE:
+            return "Error opening image";
+        case ERROR_OPEN_FILE:
+            return "Error opening file";
+        case ERROR_READ_FILE:
+            return "Error reading file";
         default:
             return "Unknown error";
     }
