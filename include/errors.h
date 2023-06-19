@@ -11,6 +11,6 @@
 #define ERROR_INIT 2
 #define ERROR_PARAMS 3
 
-void exitError(uint8_t errorCode, char* errorMsg);
+void exitError(uint8_t errorCode);
 
 #endif // ERRORS_H

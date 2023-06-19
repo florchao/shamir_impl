@@ -1,6 +1,7 @@
 #include "../include/utils.h"
 #include "../include/Distribute.h"
 #include "../include/Recover.h"
+#include "../include/errors.h"
 
 TParams* validateParams(int argc, char* argv[]);
 uint8_t validK[] = { 3,4,5,6,7,8 };
@@ -23,8 +24,7 @@ int main(int argc, char* argv[]) {
 TParams* validateParams(int argc, char* argv[]) {
 
     if (argc != EXPECTED_PARAMS) {
-        printf("Params must be 5\n");
-        exit(1);
+        exitError(ERROR_PARAMS);
     }
     struct params* params = malloc(sizeof(struct params));
     if (params == NULL) {

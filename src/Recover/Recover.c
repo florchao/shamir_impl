@@ -19,7 +19,7 @@ void recover(TParams* params){
     
     recoverSecret(recover);
     printf("llegue after recover\n");
-    freeShadows(recover->generatedShadows, recover->n);
+    //freeShadows(recover->generatedShadows, recover->n);
     freerecover(recover);
 }
 
@@ -27,90 +27,85 @@ void recover(TParams* params){
 // STATIC FUNCTIONS ---------------------------------
 //---------------------------------------------------
 
-static TShadowGenerator * initializeRecover(TParams * params){
-    TShadowGenerator * recover = malloc(sizeof(TShadowGenerator));
+static TShadowGenerator* initializeRecover(TParams* params) {
+    TShadowGenerator* recover = malloc(sizeof(TShadowGenerator));
     if (recover == NULL) {
-        perror("Memory allocation failed for recover.\n");
+        printf("Memory allocation failed for recover.\n");
         return NULL;
     }
-
     recover->k = params->k;
     recover->n = params->n;
     openDirectory(recover, params->directory);
-    recover->recoveredImage = malloc(sizeof(strlen(params->file)));
-    if (recover-> recoveredImage == NULL) {
+    
+    // Allocate memory for recoveredImage with the correct size
+    recover->recoveredImage = malloc(strlen(params->file) + 1);
+    if (recover->recoveredImage == NULL) {
         free(recover);
-        perror("Memory allocation failed for recover.\n");
+        printf("Memory allocation failed for recover.\n");
         return NULL;
     }
-    // u_long i = 0;
-    // while (i < strlen(params->file)){
-    //     recover->recoveredImage[i] = params->file[i++];
-    // }
-    // recover->recoveredImage[i] =0;
     strcpy(recover->recoveredImage, params->file);
-    printf("%s\n", recover->recoveredImage);
-    printf("%s\n", params->file);
     return recover;
 }
 
-/*
- TShadowGenerator * retriever = malloc(sizeof(TShadowGenerator));
-    if (retriever == NULL) {
-        printf("Memory allocation failed for retriever.\n");
-        return NULL;
-    }
-    retriever->k = params->k;
-    retriever->n = params->n;
-    openDirectory(retriever, params->directory);
-    retriever->retrievedImage = malloc(sizeof(strlen(params->file)));
-    if (retriever-> retrievedImage == NULL) {
-        free(retriever);
-        printf("Memory allocation failed for retriever.\n");
-        return NULL;
-    }
-    strcpy(retriever->retrievedImage, params->file);
-    return retriever;*/
-
 static void initializeShadows(TShadowGenerator* shadowGenerator) {
 
-    TShadow** shadows = malloc(shadowGenerator->k * sizeof(TShadow*));
-    if (shadows == NULL){
-        perror("Unable to allocate memory for shadows");
-        exit(1);
+   TShadow** parsedShadows = malloc(shadowGenerator->k * sizeof(TShadow*));
+    if (parsedShadows == NULL) {
+        perror("Unable to allocate memory for parsedShadows");
+        return;
     }
 
-    bmpFile  * currentImageFile;
+    bmpFile* currentImageFile = NULL;
+
     for (int i = 0; i < shadowGenerator->k; i++) {
         currentImageFile = openBmpFile(shadowGenerator->imageFiles[i]);
-        shadows[i] = fromImageToShadow(shadowGenerator->k, currentImageFile);
+        if (currentImageFile == NULL) {
+            perror("Failed to open BMP file");
+            freeShadows(parsedShadows, shadowGenerator->k);
+            return;
+        }
+        parsedShadows[i] = fromImageToShadow(shadowGenerator->k, currentImageFile);
+        if (parsedShadows[i] == NULL) {
+            perror("Failed to convert image to shadow");
+            freeShadows(parsedShadows, i);  // Free previously allocated shadows
+            return;
+        }
     }
 
-    shadowGenerator->generatedShadows = shadows;
+    shadowGenerator->generatedShadows = parsedShadows;
 
-    shadowGenerator->file = malloc(sizeof(bmpFile * ));
-    if (shadowGenerator->file  == NULL){
-        perror("Unable to allocate memory for bmp file");
-        freeShadows(shadows, shadowGenerator->k);
-        exit(1);
+    shadowGenerator->file = malloc(sizeof(bmpFile));
+    if (shadowGenerator->file == NULL) {
+        perror("Unable to allocate memory for bmpFile");
+        freeShadows(parsedShadows, shadowGenerator->k);
+        return;
     }
+
     int headerSize = currentImageFile->header->size - currentImageFile->header->image_size_bytes;
-    shadowGenerator->file->header = malloc(headerSize * sizeof (uint8_t));
-    if (shadowGenerator->file->header  == NULL){
+    shadowGenerator->file->header = malloc(headerSize);
+    if (shadowGenerator->file->header == NULL) {
         perror("Unable to allocate memory for bmp file header");
         free(shadowGenerator->file);
-        freeShadows(shadows, shadowGenerator->k);
-        exit(1);
+        freeShadows(parsedShadows, shadowGenerator->k);
+        return;
     }
+
     memcpy(shadowGenerator->file->header, currentImageFile->header, headerSize);
-    shadowGenerator->file->pixels = calloc(shadowGenerator->file->header->image_size_bytes,1 );
-    if (shadowGenerator->file->pixels  == NULL){
+
+    shadowGenerator->file->pixels = malloc(currentImageFile->header->image_size_bytes);
+    if (shadowGenerator->file->pixels == NULL) {
         perror("Unable to allocate memory for bmp file pixels");
         free(shadowGenerator->file->header);
         free(shadowGenerator->file);
-        freeShadows(shadows, shadowGenerator->k);
-        exit(1);
+        freeShadows(parsedShadows, shadowGenerator->k);
+        return;
     }
+
+    // Copy the pixel data from the currentImageFile
+    memcpy(shadowGenerator->file->pixels, currentImageFile->pixels, currentImageFile->header->image_size_bytes);
+
+
 }
 
 static void freerecover(TShadowGenerator * recover) {

@@ -2,9 +2,9 @@
 
 static char* getErrorMsg(uint8_t errorCode);
 
-void exitError(uint8_t errorCode, char* errorMsg) {
-    perror("%s: %s", getErrorMsg(errorCode), errorMsg);
-    exit(errorMsg);
+void exitError(uint8_t errorCode) {
+    perror(getErrorMsg(errorCode));
+    exit(errorCode);
 }
 
 //---------------------------------------------------

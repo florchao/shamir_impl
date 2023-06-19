@@ -15,13 +15,6 @@ uint8_t twoSignificant[] = {0xF0, 0x0F};
 void distribute(TParams* params) {
     TShadowGenerator* generator = initializeDistributor(params);
     distributeSecret(generator);
-    // printf("\n");
-    // printf("Shadows generated:\n");
-    // for (uint8_t i = 0; i < 1; i++) {
-    //     for (uint64_t j = 0; j < generator->generatedShadows[i]->pointNumber; j++) {
-    //         printf("%d ", generator->generatedShadows[i]->points[j]);
-    //     }
-    // }
     hideSecret(generator);
     printf("llegue");
     free(generator->file);
@@ -58,6 +51,10 @@ static void distributeSecret(TShadowGenerator* shadowGenerator) {
     while (currentBlock < blockCount) {
         uint8_t* a_c = malloc(k * sizeof(uint8_t));
         uint8_t* b_c = malloc(k * sizeof(uint8_t));
+        if (a_c == NULL || b_c == NULL){
+            perror("Failed to assign memory to a_c and/or b_c");
+            exit(1);
+        }
 
         memcpy(a_c, blockPosition, k);
         memcpy(b_c + 2, blockPosition + k, k - 2);
@@ -93,9 +90,19 @@ static TShadow ** initializeShadows(TShadowGenerator* shadowGenerator, uint32_t 
     //initialize all TShadow structures.
     for (int i = 0; i < shadowGenerator->n; i++) {
         shadows[i] = malloc(sizeof(TShadow));
+        if (shadows[i] == NULL){
+            perror("Failed to assign memory to shadows array");
+            freeShadows(shadows, shadowGenerator->n);
+            return NULL;
+        }
         shadows[i]->shadowNumber = i + 1;
         shadows[i]->pointNumber = blockCount;
         shadows[i]->points = malloc(blockCount * sizeof(uint8_t));
+        if (shadows[i]->points == NULL){
+            perror("Failed to assign memory to points in shadows array");
+            freeShadows(shadows, shadowGenerator->n);
+            return NULL;
+        }
     }
     return  shadows;
 }
