@@ -8,7 +8,7 @@ uint8_t validK[] = { 3,4,5,6,7,8 };
 int main(int argc, char* argv[]) {
     struct params* params = validateParams(argc, argv);
     printf("Params:\n");
-    printf("Action: %s\n", params->action == DISTRIBUTE ? "Distribute" : "Retrieve");
+    printf("Action: %s\n", params->action == DISTRIBUTE ? "Distribute" : "Recover");
     printf("File: %s\n", params->file);
     printf("K: %d\n", params->k);
     printf("N: %d\n", params->n);
@@ -28,13 +28,13 @@ TParams* validateParams(int argc, char* argv[]) {
     }
     struct params* params = malloc(sizeof(struct params));
     if (params == NULL) {
-            printf("Memory allocation failed for params.\n");
+            perror("Memory allocation failed for params.\n");
             exit(1);
     }
-    params->action = strcmp(argv[1], "d") == 0 ? DISTRIBUTE : RETRIEVE;
+    params->action = strcmp(argv[1], "d") == 0 ? DISTRIBUTE : RECOVER;
     params->file = malloc((strlen(argv[2]) + 1));
     if (params->file == NULL) {
-            printf("Memory allocation failed for file.\n");
+            perror("Memory allocation failed for file.\n");
             free(params);
             exit(1);
     }
@@ -46,14 +46,14 @@ TParams* validateParams(int argc, char* argv[]) {
             valid = 1;
     }
     if (!valid) {
-        printf("Invalid k: %d\n", params->k);
+        perror("Invalid k:\n");
         free(params->file);
         free(params);
         exit(1);
     }
     params->directory = malloc(sizeof(argv[4]) + 1);
     if (params->directory == NULL) {
-            printf("Memory allocation failed for directory.\n");
+            perror("Memory allocation failed for directory.\n");
             free(params->file);
             free(params);
             exit(1);

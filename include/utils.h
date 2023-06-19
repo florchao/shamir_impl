@@ -7,6 +7,7 @@
 #include <string.h> 
 #include <dirent.h>
 #include "bmp.h"
+#include "errors.h"
 
 
 #define EXPECTED_PARAMS 5
@@ -14,7 +15,7 @@
 
 typedef enum {
     DISTRIBUTE,
-    RETRIEVE
+    RECOVER
 } PROGRAM_ACTION;
 
 typedef struct params {
@@ -31,20 +32,13 @@ typedef struct shadow {
     uint8_t* points;
 } TShadow;
 
-// [[s1], [s2], .. [sn]]
-
-// s1 = {
-//       1 (1 a n), j(q de bloques), [v1, .., vj]
-//                                  v0m, v0d, v2m, v2d, 
-//       }
-
 typedef struct shadowGenerator {
     bmpFile* file; // name of the bmp file
     uint8_t  k; // polynomial grade
     uint8_t  n; // number of shadows
     TShadow** generatedShadows;  
     char** imageFiles;
-    char* retrievedImage;
+    char* recoveredImage;
 } TShadowGenerator;
 
 

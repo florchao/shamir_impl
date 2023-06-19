@@ -23,7 +23,7 @@ void openDirectory(TShadowGenerator* generator, char* directoryPath) {
     DIR* directory = opendir(directoryPath);
     if (directory == NULL) {
         perror("Unable to open the given directory");
-        return;
+        exit(1);
     }
     char** fileNames = malloc(generator->n * sizeof(char*));
     int currentFile = 0;
