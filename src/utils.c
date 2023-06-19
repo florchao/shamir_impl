@@ -59,3 +59,18 @@ void openDirectory(TShadowGenerator* generator, char* directoryPath) {
     //     printf("%s\n", generator->imageFiles[i]);
     // }
 }
+
+void freeShadow(TShadow * shadow){
+    if(shadow->points != NULL){
+        free(shadow->points);
+    }
+    free(shadow);
+
+}
+
+void freeShadows(TShadow** shadows, uint8_t length){
+    for(int i=0; i< length; i++){
+        freeShadow(shadows[i]);
+    }
+    free(shadows);
+}

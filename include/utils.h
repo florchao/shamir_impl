@@ -39,10 +39,10 @@ typedef struct shadow {
 //       }
 
 typedef struct shadowGenerator {
-    bmpFile* file;
-    uint8_t  k;
-    uint8_t  n;
-    TShadow** generatedShadows;
+    bmpFile* file; // name of the bmp file
+    uint8_t  k; // polynomial grade
+    uint8_t  n; // number of shadows
+    TShadow** generatedShadows;  
     char** imageFiles;
     char* retrievedImage;
 } TShadowGenerator;
@@ -55,6 +55,9 @@ uint8_t  modDiv(uint64_t x, uint64_t y);
 uint8_t mod(int64_t x);
 
 void openDirectory(TShadowGenerator* generator, char* directoryPath);
+
+void freeShadows(TShadow** shadows, uint8_t length);
+void freeShadow(TShadow * shadow);
 
 static const uint8_t inverses[P] = {
         0, 1, 126, 84, 63, 201, 42, 36, 157, 28, 226, 137, 21, 58, 18, 67, 204,

@@ -7,7 +7,6 @@ static TShadowGenerator* initializeDistributor(TParams* params);
 static void hideSecret(TShadowGenerator * shadowGenerator);
 static void hideShadow(uint8_t  k , bmpFile * image, TShadow * hidingShadow);
 static void insertBits(uint8_t  *imagePixelPointer, uint8_t  *shadowPointer, uint8_t k);
-static void freeShadows(TShadow** shadows, uint8_t length);
 
 uint8_t fourSignificant[] = {0xC0, 0x30, 0x0C, 0x03};
 uint8_t twoSignificant[] = {0xF0, 0x0F};
@@ -165,12 +164,4 @@ static void insertBits(uint8_t  * imagePixelPointer, uint8_t  *shadowPointer, ui
     for (int i = 0 ; i < bytesUsedFromImage ; i++)
         imagePixelPointer[i] = (imagePixelPointer[i] & and) + bits[i];
 
-}
-
-static void freeShadows(TShadow** shadows, uint8_t length){
-    for(int i=0; i< length; i++){
-        free(shadows[i]->points);
-        free(shadows[i]);
-    }
-    free(shadows);
 }
