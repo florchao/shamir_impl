@@ -17,6 +17,8 @@ static char* getErrorMsg(uint8_t errorCode) {
             return "Error allocating memory";
         case ERROR_INIT:
             return "Error initializing";
+        case ERROR_PARAMS:
+            return "Error in params";
         default:
             return "Unknown error";
     }

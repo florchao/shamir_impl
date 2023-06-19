@@ -9,6 +9,7 @@
 //Error codes
 #define ERROR_MALLOC 1
 #define ERROR_INIT 2
+#define ERROR_PARAMS 3
 
 void exitError(uint8_t errorCode, char* errorMsg);
 
