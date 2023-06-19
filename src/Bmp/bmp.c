@@ -18,6 +18,10 @@ bmpFile* openBmpFile(const char* path) {
 
 
     void* filePointer = malloc(fileSize);
+    if (filePointer == NULL) {
+            printf("Memory allocation failed for file pointer.\n");
+            return NULL;
+    }
 
     if (read(fd, filePointer, fileSize) != fileSize) {
         printf("Unable to read file");
@@ -25,11 +29,13 @@ bmpFile* openBmpFile(const char* path) {
     }
 
     bmpHeader* headerPointer = (bmpHeader*) filePointer;
-    uint32_t pixelsOffset = headerPointer->offset;
-
-    uint8_t* pixelsPointer = ((uint8_t*) filePointer) + pixelsOffset;
+    uint8_t* pixelsPointer = ((uint8_t*) filePointer) + headerPointer->offset;
 
     bmpFile* bitMapFile = malloc(sizeof(bmpFile));
+    if (bitMapFile == NULL) {
+            printf("Memory allocation failed for file.\n");
+            return NULL;
+    }
     bitMapFile->header = headerPointer;
     bitMapFile->pixels = pixelsPointer;
     bitMapFile->fd = fd;

@@ -46,7 +46,7 @@ static TShadowGenerator* initializeDistributor(TParams* params) {
 
 static void distributeSecret(TShadowGenerator* shadowGenerator) {
 
-    uint32_t blockCount = (shadowGenerator->file->header->size) / (shadowGenerator->k - 1);
+    uint32_t blockCount = (shadowGenerator->file->header->image_size_bytes) / (shadowGenerator->k - 1);
     uint8_t k = shadowGenerator->k;
     uint8_t blockSize = 2 * k - 2;
 
@@ -62,7 +62,6 @@ static void distributeSecret(TShadowGenerator* shadowGenerator) {
         uint8_t* b_c = malloc(k * sizeof(uint8_t));
 
         memcpy(a_c, blockPosition, k);
-        //ME DA BUFFER OVERFLOW ACA CUANDO ESTA POR EL BLOQUE 45000
         memcpy(b_c + 2, blockPosition + k, k - 2);
         
         uint8_t r = 0;
@@ -85,13 +84,8 @@ static void distributeSecret(TShadowGenerator* shadowGenerator) {
         currentBlock += 2;
         free(a_c);
         free(b_c);
-        printf("ACA %d de %d\n", currentBlock, blockCount);
-
     }
-
-    printf("ACAC\n");
     shadowGenerator->generatedShadows = shadows;
-
 }
 
 static void openDirectory(TShadowGenerator* generator, char* directoryPath) {
