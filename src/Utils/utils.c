@@ -6,11 +6,11 @@ uint8_t  sum(uint64_t x, uint64_t y) {
 uint8_t  sub(uint64_t x, uint64_t y) {
     return mod(x - y);
 }
-uint8_t  mul(uint64_t x, uint64_t y) {
+uint8_t  times(uint64_t x, uint64_t y) {
     return mod(x * y);
 }
 uint8_t  modDiv(uint64_t x, uint64_t y) {
-    return mul(x, inverses[mod(y)]);
+    return times(x, inverses[mod(y)]);
 }
 uint8_t mod(int64_t x) {
     while (x < 0) {
@@ -58,8 +58,8 @@ void openDirectory(TShadowGenerator* generator, char* directoryPath) {
 }
 
 void freeShadow(TShadow * shadow){
-    if(shadow->points != NULL){
-        free(shadow->points);
+    if(shadow->values != NULL){
+        free(shadow->values);
     }
     free(shadow);
 

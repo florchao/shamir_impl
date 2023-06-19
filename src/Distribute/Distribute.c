@@ -63,13 +63,13 @@ static void distributeSecret(TShadowGenerator* shadowGenerator) {
         }
         a_0 = mod(a_c[0]) == 0 ? 1 : a_c[0];
         a_1 = mod(a_c[1]) == 0 ? 1 : a_c[1];
-        b_c[0] = mod(mul(mod(-r), a_0));
-        b_c[1] = mod(mul(mod(-r), a_1));
+        b_c[0] = mod(times(mod(-r), a_0));
+        b_c[1] = mod(times(mod(-r), a_1));
 
         for (int j = 0; j < shadowGenerator->n; j++) {
-            shadows[j]->points[currentBlock] = poly(shadowGenerator->k,
+            shadows[j]->values[currentBlock] = poly(shadowGenerator->k,
                 a_c, shadows[j]->shadowNumber);
-            shadows[j]->points[currentBlock + 1] = poly(shadowGenerator->k,
+            shadows[j]->values[currentBlock + 1] = poly(shadowGenerator->k,
                 b_c, shadows[j]->shadowNumber);
         }
 
@@ -94,9 +94,9 @@ static TShadow ** initializeShadows(TShadowGenerator* shadowGenerator, uint32_t 
             return NULL;
         }
         shadows[i]->shadowNumber = i + 1;
-        shadows[i]->pointNumber = blockCount;
-        shadows[i]->points = malloc(blockCount * sizeof(uint8_t));
-        if (shadows[i]->points == NULL){
+        shadows[i]->valuesSize = blockCount;
+        shadows[i]->values = malloc(blockCount * sizeof(uint8_t));
+        if (shadows[i]->values == NULL){
             freeShadows(shadows, shadowGenerator->n);
             exitError(ERROR_MALLOC);
             return NULL;
@@ -112,8 +112,8 @@ static uint8_t poly(uint8_t k, uint8_t* coefficients, uint8_t value) {
     uint8_t x2 = mod(value);
 
     for (uint8_t i = 0; i < k; i++) {
-        result = sum(result, mul(coefficients[i], exp));
-        exp = mul(exp, x2);
+        result = sum(result, times(coefficients[i], exp));
+        exp = times(exp, x2);
     }
 
     return result;
@@ -140,8 +140,8 @@ static void hideSecret(TShadowGenerator * shadowGenerator){
 static void hideShadow(uint8_t  k , bmpFile * image, TShadow * hidingShadow){
     image->header->reserved1 = hidingShadow->shadowNumber; //save the shadow number.
     uint8_t * imagePixelPointer = image->pixels;
-    uint8_t * shadowPointer = hidingShadow->points;
-    for(uint32_t  i = 0; i < hidingShadow->pointNumber; i++ ){
+    uint8_t * shadowPointer = hidingShadow->values;
+    for(uint32_t  i = 0; i < hidingShadow->valuesSize; i++ ){
             insertBits(imagePixelPointer, shadowPointer, k);
             shadowPointer += 1 ; //go to the next point;
             imagePixelPointer += (k == 3 || k == 4) ? 2 : 4;

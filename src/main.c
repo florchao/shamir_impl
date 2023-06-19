@@ -3,6 +3,8 @@
 #include "../include/Recover.h"
 #include "../include/errors.h"
 
+#define Q_SHADOWS 8
+
 TParams* validateParams(int argc, char* argv[]);
 uint8_t validK[] = { 3,4,5,6,7,8 };
 
@@ -49,6 +51,6 @@ TParams* validateParams(int argc, char* argv[]) {
             exitError(ERROR_MALLOC);
     }
     strcpy(params->directory, argv[4]);
-    params->n = 8; //SHADOWS_NUMBER;
+    params->n = Q_SHADOWS; 
     return params;
 }

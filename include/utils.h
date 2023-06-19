@@ -28,8 +28,8 @@ typedef struct params {
 
 typedef struct shadow {
     uint8_t shadowNumber;
-    uint64_t pointNumber;
-    uint8_t* points;
+    uint64_t valuesSize;
+    uint8_t* values;
 } TShadow;
 
 typedef struct shadowGenerator {
@@ -44,7 +44,7 @@ typedef struct shadowGenerator {
 
 uint8_t  sum(uint64_t x, uint64_t y);
 uint8_t  sub(uint64_t x, uint64_t y);
-uint8_t  mul(uint64_t x, uint64_t y);
+uint8_t  times(uint64_t x, uint64_t y);
 uint8_t  modDiv(uint64_t x, uint64_t y);
 uint8_t mod(int64_t x);
 
