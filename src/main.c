@@ -8,12 +8,6 @@ uint8_t validK[] = { 3,4,5,6,7,8 };
 
 int main(int argc, char* argv[]) {
     struct params* params = validateParams(argc, argv);
-    printf("Params:\n");
-    printf("Action: %s\n", params->action == DISTRIBUTE ? "Distribute" : "Recover");
-    printf("File: %s\n", params->file);
-    printf("K: %d\n", params->k);
-    printf("N: %d\n", params->n);
-    printf("Directory: %s\n", params->directory);
     if (params->action == DISTRIBUTE)
         distribute(params);
     else
