@@ -52,7 +52,8 @@ static void initializeShadows(TShadowGenerator* shadowGenerator) {
 
     bmpFile* currentImageFile = NULL;
 
-    for (int i = 0; i < shadowGenerator->k; i++) {
+    int i=0;
+    for (i = 0; i < shadowGenerator->k; i++) {
         currentImageFile = openBmpFile(shadowGenerator->imageFiles[i]);
         if (currentImageFile == NULL) {
             freeShadows(parsedShadows, shadowGenerator->k);
@@ -98,8 +99,7 @@ static void initializeShadows(TShadowGenerator* shadowGenerator) {
 
     // Copy the pixel data from the currentImageFile
     memcpy(shadowGenerator->file->pixels, currentImageFile->pixels, currentImageFile->header->image_size_bytes);
-    freeShadows(parsedShadows, shadowGenerator->k);
-
+    
 }
 
 static void freerecover(TShadowGenerator * recover) {
