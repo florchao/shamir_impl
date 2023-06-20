@@ -54,7 +54,6 @@ void openDirectory(TShadowGenerator* generator, char* directoryPath) {
     }
     free(fileNames);
     free(entry);
-    free(directory);
 }
 
 void freeShadow(TShadow * shadow){

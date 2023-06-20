@@ -98,7 +98,7 @@ static void initializeShadows(TShadowGenerator* shadowGenerator) {
 
     // Copy the pixel data from the currentImageFile
     memcpy(shadowGenerator->file->pixels, currentImageFile->pixels, currentImageFile->header->image_size_bytes);
-
+    freeShadows(parsedShadows, shadowGenerator->k);
 
 }
 
@@ -164,6 +164,7 @@ static void recoverSecret(TShadowGenerator* generator){
 
         imagePointer += (2*k) - 2;
         currentBlock += 2 ;
+        free(coefficients);
     }
 
     int fd = open(generator->recoveredImage, O_WRONLY | O_CREAT);
