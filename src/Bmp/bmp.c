@@ -21,7 +21,7 @@ bmpFile* openBmpFile(const char* path) {
     }
 
     if (read(fd, filePointer, fileSize) != fileSize) {
-        free(filePointer);
+        //free(filePointer);
         exitError(ERROR_READ_FILE);
     }
 
@@ -30,7 +30,7 @@ bmpFile* openBmpFile(const char* path) {
 
     bmpFile* bitMapFile = malloc(sizeof(bmpFile));
     if (bitMapFile == NULL) {
-        free(filePointer);
+        //free(filePointer);
         exitError(ERROR_MALLOC);
     }
     bitMapFile->header = headerPointer;
