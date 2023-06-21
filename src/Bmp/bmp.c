@@ -1,4 +1,4 @@
-#include "../../include/bmp.h"
+#include "../include/bmp.h"
 
 bmpFile* openBmpFile(const char* path) {
     int fd = open(path, O_RDWR);

@@ -1,4 +1,5 @@
-#include "../../include/Recover.h"
+#include "../include/Recover.h"
+
 static TShadowGenerator * initializeRecover(TParams * params);
 static void initializeShadows(TShadowGenerator* shadowGenerator);
 static TShadow * fromImageToShadow(uint8_t k ,bmpFile * imageFile);

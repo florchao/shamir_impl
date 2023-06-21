@@ -1,4 +1,4 @@
-#include "../../include/utils.h"
+#include "../include/utils.h"
 
 uint8_t  sum(uint64_t x, uint64_t y) {
     return mod(x + y);

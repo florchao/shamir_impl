@@ -1,4 +1,4 @@
-#include "../../include/Distribute.h"
+#include "../include/Distribute.h"
 
 static TShadow** initializeShadows(TShadowGenerator* shadowGenerator, uint32_t blockCount);
 static uint8_t poly(uint8_t k, uint8_t* coefficients, uint8_t value);

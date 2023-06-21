@@ -1,7 +1,7 @@
-#include "../include/utils.h"
-#include "../include/Distribute.h"
-#include "../include/Recover.h"
-#include "../include/errors.h"
+#include "include/utils.h"
+#include "include/Distribute.h"
+#include "include/Recover.h"
+#include "include/errors.h"
 
 #define Q_SHADOWS 8
 
