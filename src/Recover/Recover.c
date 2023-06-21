@@ -118,6 +118,7 @@ static void freerecover(TShadowGenerator * recover) {
     for (int i = 0; i < recover->n; i++) {
         free(recover->imageFiles[i]);
     }
+    freeShadows(recover->generatedShadows, recover->k);
     free(recover->imageFiles);
     free(recover->recoveredImage);
     free(recover);
