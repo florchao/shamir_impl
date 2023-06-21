@@ -16,6 +16,12 @@ void distribute(TParams* params) {
     TShadowGenerator* generator = initializeDistributor(params);
     distributeSecret(generator);
     hideSecret(generator);
+
+    for (int i = 0; i < generator->n; i++) {
+        free(generator->imageFiles[i]);
+    }
+    
+    free(generator->imageFiles);
     free(generator->file->header);
     free(generator->file);
     freeShadows(generator->generatedShadows, generator->n);
