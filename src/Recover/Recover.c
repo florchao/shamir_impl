@@ -100,9 +100,13 @@ static void initializeShadows(TShadowGenerator* shadowGenerator) {
     // Copy the pixel data from the currentImageFile
     memcpy(shadowGenerator->file->pixels, currentImageFile->pixels, currentImageFile->header->image_size_bytes);
 
+    free(currentImageFile->header);
+    free(currentImageFile);
+
 }
 
 static void freerecover(TShadowGenerator * recover) {
+    free(recover->file->header);
     free(recover->file->pixels);
     free(recover->file);
     for (int i = 0; i < recover->n; i++) {
