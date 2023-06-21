@@ -49,11 +49,12 @@ void openDirectory(TShadowGenerator* generator, char* directoryPath) {
         strcpy(generator->imageFiles[i] + strlen(fileNames[i]), "\0");
     }
 
-    for(int i=0 ; i<generator->n; i++){
+    for(int i=0 ; i<currentFile; i++){
         free(fileNames[i]);
     }
     free(fileNames);
     free(entry);
+    closedir(directory);
 }
 
 void freeShadow(TShadow * shadow){
