@@ -133,6 +133,9 @@ static void hideSecret(TShadowGenerator * shadowGenerator){
         write(currentImageFile->fd , currentImageFile->header, headerSize);
         write(currentImageFile->fd , currentImageFile->pixels, currentImageFile->header->image_size_bytes);
         close(currentImageFile->fd);
+
+        free(currentImageFile->header);
+        free(currentImageFile);
     }
 
 }
