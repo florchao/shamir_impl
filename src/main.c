@@ -14,6 +14,9 @@ int main(int argc, char* argv[]) {
         distribute(params);
     else
         recover(params);
+    free(params->directory);
+    free(params->file);
+    free(params);
     return 0;
 }
 
