@@ -66,6 +66,12 @@ static void initializeShadows(TShadowGenerator* shadowGenerator) {
             exitError(ERROR_MALLOC);
             return;
         }
+
+        if(i< shadowGenerator->k-1){
+            free(currentImageFile->header);
+            free(currentImageFile);
+        }
+        
     }
 
     shadowGenerator->generatedShadows = parsedShadows;
