@@ -27,7 +27,7 @@ In the case that one wants to distribute a secret between images, run the follow
 ```
 $> ./ss d [PATH_TO_SECRET] 3 images
 ```
-where PATH_TO_SECRET is the path to a .bmp image in black and white (8 bits per pixel) that you want distributed between the files of the images directory.
+where PATH_TO_SECRET is the path to a .bmp image in black and white (8 bits per pixel) that you want distributed between the files of the images directory which has to be created inside the root directory.
 
 In the case that one wants to recover a secret, run the following comand:
 ```
