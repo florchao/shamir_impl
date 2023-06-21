@@ -189,8 +189,12 @@ static void recoverSecret(TShadowGenerator* generator){
 
 static uint8_t  * interpolate(uint8_t  k , uint8_t * x_c, uint8_t * a_c, uint8_t * b_c){
     uint8_t  * coefficient = malloc( 2* k* sizeof(uint8_t));
-    memcpy(coefficient, interpolatePolynomial(k, a_c, x_c), k);
-    memcpy(coefficient + k , interpolatePolynomial(k , b_c, x_c) , k);
+    uint8_t * aux = interpolatePolynomial(k, a_c, x_c);
+    uint8_t * aux2 = interpolatePolynomial(k , b_c, x_c);
+    memcpy(coefficient, aux, k);
+    memcpy(coefficient + k , aux2 , k);
+    free(aux);
+    free(aux2);
     return  coefficient;
 }
 
